@@ -1,0 +1,1 @@
+export PRJROOT=$PWD

@@ -8,6 +8,12 @@
 #ifndef SRC_SUBSCRIBER_INCLUDE_SUBSCRIBER_H_
 #define SRC_SUBSCRIBER_INCLUDE_SUBSCRIBER_H_
 
+#define MQTT_SERVER_IP                  "127.0.0.1"
+#define MQTT_SERVER_PORT                1883
+#define MQTT_CONNECTION_TIMEOUT         60
+
+#define MQTT_TOPIC                      "ad_playlist"
+
 VOID mbeSubscriberTaskCreate();
 VOID mbeSubscriberTaskDelete();
 

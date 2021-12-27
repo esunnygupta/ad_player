@@ -33,6 +33,7 @@ clean:
 	$(MAKE) -C src/client clean
 	$(MAKE) -C src/osal clean
 	$(MAKE) -C src/subscriber clean
+	@$(RM) -rf src/include/*.h
 	@$(RM) -rf build/*.o
 	@$(RM) -rf build
 	@$(RM) -rf bin/*

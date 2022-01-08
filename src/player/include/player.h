@@ -1,16 +1,18 @@
-/*
- * player.h
- *
- *  Created on: 01-Oct-2018
- *      Author: sunny
+/**
+ * @file player.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-01-09
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
 #ifndef SRC_PLAYER_INCLUDE_PLAYER_H_
 #define SRC_PLAYER_INCLUDE_PLAYER_H_
 
-#include <client.h>
-#include <render_gl.h>
-
-int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl);
+VOID mbePlayerTaskCreate();
+VOID mbePlayerTaskDelete();
 
 #endif /* SRC_PLAYER_INCLUDE_PLAYER_H_ */

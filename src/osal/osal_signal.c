@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #include <mosquitto.h>
 
@@ -22,6 +23,7 @@
 
 extern I4 gMessageQdescriptor;
 extern struct mosquitto *mosq_client;
+extern volatile I4 extFlag;
 
 VOID mbeSigIntHandler(I4 signum)
 {
@@ -29,7 +31,7 @@ VOID mbeSigIntHandler(I4 signum)
     const char message_q_name[8] = "/main_q";
 
     mprintf("Signal Captured\n");
-
+    mbeSendMessageToMsgQ(gMessageQdescriptor, "exit", 5);
     retval = mbeDeleteMessageQ(message_q_name, gMessageQdescriptor);
     if (retval < 0)
     {

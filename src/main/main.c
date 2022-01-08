@@ -60,7 +60,7 @@ PVOID mbeAppMainTask()
 	mbeRegisterSignalHandler(SIGINT, mbeSigIntHandler);
 
 	// Create a Message Q for sending events.
-	mqdes = mbeCreateMessageQ(message_q_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+	mqdes = mbeCreateMessageQ(message_q_name, O_CREAT | O_RDWR, 0660);
 	gMessageQdescriptor = mqdes;
 
 	mprintf("exit...\n");

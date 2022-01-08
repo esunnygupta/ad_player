@@ -14,6 +14,7 @@
 #include <hw_info.h>
 #include <client.h>
 #include <subscriber.h>
+#include <player.h>
 
 MBEMAIN_FILE_INFO_STRUCT stFileInfo;
 
@@ -37,10 +38,12 @@ I2 app()
 	// Create Tasks
 	// mbeProtocolTaskCreate();
 	mbeSubscriberTaskCreate();
+	mbePlayerTaskCreate();
 
 	// Delete Tasks
 	// mbeProtocolTaskDelete();
 	mbeSubscriberTaskDelete();
+	mbePlayerTaskDelete();
 
 	return 0;
 }

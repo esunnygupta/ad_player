@@ -12,12 +12,12 @@
 #ifndef SRC_OSAL_INCLUDE_OSAL_MSGQ_H_
 #define SRC_OSAL_INCLUDE_OSAL_MSGQ_H_
 
-#define MESSAGE_Q_MAX_MESSAGES      50
-#define MESSAGE_Q_MAX_MESSAGE_SIZE  2048
+#define MESSAGE_Q_MAX_MESSAGES      10
+#define MESSAGE_Q_MAX_MESSAGE_SIZE  256
 
 I4 mbeCreateMessageQ(const char *name, I4 flags, MODE mode);
 I4 mbeDeleteMessageQ(const char *name, I4 mqdes);
 I4 mbeSendMessageToMsgQ(I4 mqdes, const char *message, I4 msg_len);
-I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message, I4 msg_len);
+I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message);
 
 #endif /* SRC_OSAL_INCLUDE_OSAL_MSGQ_H_ */

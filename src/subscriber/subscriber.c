@@ -15,12 +15,14 @@
 #include <osal_type.h>
 #include <osal_list.h>
 #include <osal_thread.h>
+#include <osal_msgq.h>
 #include <hw_info.h>
 #include <subscriber.h>
-#include <player.h>
+#include <mpv_client.h>
 
 TASK_ID gSubscriberTaskID;
 struct mosquitto *mosq_client;
+extern I4 gMessageQdescriptor;
 
 VOID mbeSubscriberConnectCallback(struct mosquitto *mosq_client, PVOID obj, I4 rc)
 {
@@ -40,8 +42,7 @@ VOID mbeSubscriberSubscribeCallback(struct mosquitto *mosq_client, PVOID obj, I4
 VOID mbeSubscriberMessageCallback(struct mosquitto *mosq_client, PVOID obj, const struct mosquitto_message *mosq_message)
 {
 	mprintf("Message: %s\n", (char *)mosq_message->payload);
-	// mpv_main((char *)mosq_message->payload, NULL, NULL);
-	mprintf("Player exited\n");
+	mbeSendMessageToMsgQ(gMessageQdescriptor, (const char *)mosq_message->payload, mosq_message->payloadlen);
 }
 
 PVOID mbeSubscriberTask()

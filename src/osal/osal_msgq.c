@@ -90,14 +90,14 @@ I4 mbeSendMessageToMsgQ(I4 mqdes, const char *message, I4 msg_len)
     ret = mq_send(mqdes, message, msg_len, 0);
     if (ret < 0)
     {
-        eprintf("Could not post message to message q.\n");
+        eprintf("Could not post message to message q. Error [%d]\n", ret);
         return MBEOSAL_TYPE_FAILURE;
     }
 
     return MBEOSAL_TYPE_SUCCESS;
 }
 
-I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message, I4 msg_len)
+I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message)
 {
     I4 ret;
     I4 no_of_bytes;
@@ -110,13 +110,7 @@ I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message, I4 msg_len)
         return MBEOSAL_TYPE_FAILURE;
     }
 
-    if (msg_len > attributes.mq_msgsize)
-    {
-        eprintf("Message length of message exceeds by %ld\n", (msg_len - attributes.mq_msgsize));
-        return MBEOSAL_TYPE_FAILURE;
-    }
-
-    no_of_bytes = mq_receive(mqdes, message, msg_len, 0);
+    no_of_bytes = mq_receive(mqdes, message, attributes.mq_msgsize, 0);
     if (no_of_bytes < 0)
     {
         eprintf("Message could not be received from message q.\n");
@@ -125,6 +119,7 @@ I4 mbeReceiveMessageFromMsgQ(I4 mqdes, PI1 message, I4 msg_len)
     else
     {
         mprintf("Message received of %d bytes.\n", no_of_bytes);
+        mprintf("Message [%s]\n", message);
     }
 
     return MBEOSAL_TYPE_SUCCESS;

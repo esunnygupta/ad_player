@@ -14,10 +14,13 @@
 #include <logs.h>
 #include <osal_type.h>
 #include <osal_list.h>
+#include <osal_thread.h>
 #include <hw_info.h>
 #include <subscriber.h>
+#include <player.h>
 
 TASK_ID gSubscriberTaskID;
+struct mosquitto *mosq_client;
 
 VOID mbeSubscriberConnectCallback(struct mosquitto *mosq_client, PVOID obj, I4 rc)
 {
@@ -37,17 +40,18 @@ VOID mbeSubscriberSubscribeCallback(struct mosquitto *mosq_client, PVOID obj, I4
 VOID mbeSubscriberMessageCallback(struct mosquitto *mosq_client, PVOID obj, const struct mosquitto_message *mosq_message)
 {
 	mprintf("Message: %s\n", (char *)mosq_message->payload);
+	// mpv_main((char *)mosq_message->payload, NULL, NULL);
+	mprintf("Player exited\n");
 }
 
 PVOID mbeSubscriberTask()
 {
 	I2 retval;
-	struct mosquitto *mosq_client;
 	mprintf("init...\n");
 	mosq_client = mosquitto_new(SERIAL_NO, true, NULL);
 	if (mosq_client == NULL)
 	{
-		mprintf("Failed to create mosquitto client...\n");
+		eprintf("Failed to create mosquitto client...\n");
 		// Todo: Send event to exit app.
 		return NULL;
 	}
@@ -57,13 +61,11 @@ PVOID mbeSubscriberTask()
 	mosquitto_message_callback_set(mosq_client, mbeSubscriberMessageCallback);
 	mosquitto_connect(mosq_client, MQTT_SERVER_IP, MQTT_SERVER_PORT, MQTT_CONNECTION_TIMEOUT);
 	mosquitto_subscribe(mosq_client, NULL, MQTT_TOPIC, 0);
-	retval = mosquitto_loop_forever(mosq_client, MQTT_CONNECTION_TIMEOUT, 1);
+	retval = mosquitto_loop_forever(mosq_client, -1, 1);
 	if (retval != MOSQ_ERR_SUCCESS)
 	{
-		mprintf("Failed to block the subscriber forever...\n");
+		eprintf("Failed to block the subscriber forever...\n");
 	}
-	mosquitto_disconnect(mosq_client);
-	mosquitto_destroy(mosq_client);
 	mprintf("exit...\n");
 
 	return NULL;
@@ -78,14 +80,14 @@ VOID mbeSubscriberTaskCreate()
 	stTaskCreate = (MBEOSAL_TASK_CREATE_STRUCT *)malloc(sizeof(MBEOSAL_TASK_CREATE_STRUCT));
 	if(NULL == stTaskCreate)
 	{
-		mprintf("malloc() failed...\n");
+		eprintf("malloc() failed...\n");
 		return;
 	}
 	stTaskCreate->task_name = mbeSubscriberTask;
 	ret = mbeOSALtaskCreate(stTaskCreate);
 	if(ret < 0)
 	{
-		mprintf("MBEAPP_mainTask not created\n");
+		eprintf("MBEAPP_mainTask not created\n");
 	}
 	gSubscriberTaskID = stTaskCreate->task_id;
 	//mprintf("exit...\n");
@@ -99,7 +101,7 @@ VOID mbeSubscriberTaskDelete()
 	ret = mbeOSALtaskJoin(gSubscriberTaskID);
 	if(ret < 0)
 	{
-		mprintf("MBEAPP_mainTask join failed\n");
+		eprintf("MBEAPP_mainTask join failed\n");
 	}
 	mbeOSALdeleteTask(gSubscriberTaskID);
 	//mprintf("exit...\n");

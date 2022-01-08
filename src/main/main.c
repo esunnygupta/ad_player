@@ -2,15 +2,17 @@
  * main.c
  *
  *  Created on: 23-Mar-2018
- *      Author: root
+ *      Author: Sunny Gupta
  */
 
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <semaphore.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include <mosquitto.h>
 
@@ -18,10 +20,13 @@
 #include <version.h>
 #include <osal_type.h>
 #include <osal_list.h>
+#include <osal_thread.h>
+#include <osal_signal.h>
+#include <osal_msgq.h>
 #include <app.h>
 
 TASK_ID gAppMainTaskID;
-//SEM gSemaphore;
+I4 gMessageQdescriptor;
 
 VOID cleanup()
 {
@@ -30,23 +35,34 @@ VOID cleanup()
 	retval = mosquitto_lib_cleanup();
 	if (retval < 0)
 	{
-		mprintf("mosquitto library cleanup failed...\n");
+		eprintf("mosquitto library cleanup failed...\n");
 	}
 }
 
 PVOID mbeAppMainTask()
 {
 	I2 retval;
+	I4 mqdes;
+	const char message_q_name[8] = "/main_q";
+
 	mprintf("init...\n");
 	
 	// TODO: System and network check. Raise error if any issue.
 
+	// Mosquitto library initialization
 	retval = mosquitto_lib_init();
 	if (retval != MOSQ_ERR_SUCCESS)
 	{
-		mprintf("mosquitto library initialization failed...\n");
-		return NULL;
+		eprintf("mosquitto library initialization failed...\n");
 	}
+
+	// Register Signal Handler for SIGINT
+	mbeRegisterSignalHandler(SIGINT, mbeSigIntHandler);
+
+	// Create a Message Q for sending events.
+	mqdes = mbeCreateMessageQ(message_q_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+	gMessageQdescriptor = mqdes;
+
 	mprintf("exit...\n");
 
 	return NULL;
@@ -59,7 +75,7 @@ VOID appExit()
 	retval = mbeOSALtaskJoin(gAppMainTaskID);
 	if(retval < 0)
 	{
-		mprintf("MBEAPP_mainTask join failed\n");
+		eprintf("MBEAPP_mainTask join failed\n");
 	}
 	mbeOSALdeleteTask(gAppMainTaskID);
 }
@@ -69,18 +85,17 @@ VOID appInit()
 	I2 ret;
 	MBEOSAL_TASK_CREATE_STRUCT *stTaskCreate;
 
-	//sem_init(&gSemaphore, 0, 1);
 	stTaskCreate = (MBEOSAL_TASK_CREATE_STRUCT *)malloc(sizeof(MBEOSAL_TASK_CREATE_STRUCT));
 	if(NULL == stTaskCreate)
 	{
-		mprintf("malloc() failed...\n");
+		eprintf("malloc() failed...\n");
 		return;
 	}
 	stTaskCreate->task_name = mbeAppMainTask;
 	ret = mbeOSALtaskCreate(stTaskCreate);
 	if(ret < 0)
 	{
-		mprintf("MBEAPP_mainTask not created\n");
+		eprintf("MBEAPP_mainTask not created\n");
 	}
 	gAppMainTaskID = stTaskCreate->task_id;
 }

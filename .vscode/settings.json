@@ -1,6 +1,11 @@
 {
     "files.associations": {
-        "client.h": "c"
+        "client.h": "c",
+        "osal_list.h": "c",
+        "osal_type.h": "c",
+        "render_gl.h": "c",
+        "logs.h": "c",
+        "osal_thread.h": "c"
     },
     "cmake.configureOnOpen": false
 }

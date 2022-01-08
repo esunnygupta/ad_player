@@ -22,7 +22,7 @@ VOID mbeOSALaddTask(MBEOSAL_TASK_LIST_STRUCT **stTaskListLocal, MBEOSAL_TASK_CRE
 	stTaskListTemp = (MBEOSAL_TASK_LIST_STRUCT *)malloc(sizeof(MBEOSAL_TASK_LIST_STRUCT));
 	if(NULL == stTaskListTemp)
 	{
-		mprintf("malloc() failed...\n");
+		eprintf("malloc() failed...\n");
 		return;
 	}
 	stTaskListTemp->stTaskCreate = stTaskCreate;
@@ -41,7 +41,7 @@ VOID mbeOSALdeleteTask(TASK_ID ui4task_id)
 	//mprintf("init...\n");
 	if(NULL == stTaskListTemp)
 	{
-		mprintf("Task List Empty...\n");
+		eprintf("Task List Empty...\n");
 		return;
 	}
 
@@ -51,7 +51,7 @@ VOID mbeOSALdeleteTask(TASK_ID ui4task_id)
 		{
 			//delete task
 			mprintf("Task ID [%lu] at [%d]\n", ui4task_id, i);
-			if(0 == i)
+		   	if(0 == i)
 			{
 				stTaskListNode = stTaskListTemp;
 				stTaskListTemp = stTaskListTemp->next;

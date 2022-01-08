@@ -29,10 +29,10 @@ I2 app()
 	// Initialize Client
 
 	// Authenticate Client
-	mbeGetToken();
+	// mbeGetToken();
 
 	// Set Media - Temporary Basis
-	mbeSetMedia();
+	// mbeSetMedia();
 
 	// Create Tasks
 	// mbeProtocolTaskCreate();

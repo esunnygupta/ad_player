@@ -7,9 +7,9 @@ PROJECT=ad_platform
 
 CC=gcc #arm-linux-gnueabihf-gcc
 AR=ar  #arm-linux-gnueabihf-ar
-CFLAGS=-Wall
-IDIR=-I/usr/local/include
-LDFLAGS=
+CFLAGS=-Wall -g
+IDIR=-I/usr/local/include -I/usr/include/SDL2
+LDFLAGS=-L./lib/
 LD_LIBRARY_PATH=
-LIBS=-lpthread -lmosquitto
+LIBS=-lpthread -lmosquitto -lmpv -lSDL2-2.0 -lrt
 EXE=$(PROJECT).elf

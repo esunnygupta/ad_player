@@ -12,6 +12,7 @@
 
 #if MAIN_DEBUG_LOG
 	#define mprintf printf("\x1B[32m[%s %d %s]# \x1B[37m",__FILE__,__LINE__,__func__); printf
+	#define eprintf printf("\x1B[31m[%s %d %s]# \x1B[37m",__FILE__,__LINE__,__func__); printf
 #else
 	#define mprintf
 #endif

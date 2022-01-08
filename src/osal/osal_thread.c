@@ -11,11 +11,10 @@
 #include <logs.h>
 #include <osal_type.h>
 #include <osal_list.h>
+#include <osal_thread.h>
 
-UI4 gTaskId = 0;
+UI8 gTaskId = 0;
 MBEOSAL_TASK_LIST_STRUCT *stTaskList = NULL;
-
-//extern SEM gSemaphore;
 
 I2 mbeOSALtaskCreate(MBEOSAL_TASK_CREATE_STRUCT *stTaskCreate)
 {
@@ -26,16 +25,14 @@ I2 mbeOSALtaskCreate(MBEOSAL_TASK_CREATE_STRUCT *stTaskCreate)
 	ret = pthread_create(&(stTaskCreate->task_id), NULL, stTaskCreate->task_name, NULL);
 	if(ret < 0)
 	{
-		mprintf("Failed[%d]\n",ret);
+		eprintf("Failed[%d]\n",ret);
 		return MBEOSAL_TYPE_FAILURE;
 	}
 	else
 	{
 		mprintf("TaskID [%lu]\n", stTaskCreate->task_id);
 		gTaskId++;
-		//sem_wait(&gSemaphore);
 		mbeOSALaddTask(&stTaskList, stTaskCreate);
-		//sem_post(&gSemaphore);
 	}
 	//mprintf("exit...\n");
 
@@ -50,7 +47,7 @@ I2 mbeOSALtaskJoin(TASK_ID ui4task_id)
 	ret = pthread_join(ui4task_id, NULL);
 	if(ret < 0)
 	{
-		mprintf("Failed[%d]\n",ret);
+		eprintf("Failed[%d]\n",ret);
 		return MBEOSAL_TYPE_FAILURE;
 	}
 	else

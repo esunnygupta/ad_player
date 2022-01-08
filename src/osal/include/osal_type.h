@@ -8,7 +8,7 @@
 #ifndef SRC_OSAL_INCLUDE_OSAL_TYPE_H_
 #define SRC_OSAL_INCLUDE_OSAL_TYPE_H_
 
-#include <semaphore.h>
+#include <fcntl.h>
 #include <pthread.h>
 
 typedef unsigned long int		TASK_ID;
@@ -33,14 +33,17 @@ typedef unsigned char *			PUI1;
 typedef signed long *			PI8;
 typedef signed int *			PI4;
 typedef signed short int *		PI2;
-typedef signed char *			PI1;
+typedef char *					PI1;
 
 typedef void * 					PVOID;
 
+typedef pthread_mutex_t 		MUTEX;
+
+typedef mode_t					MODE;
+
 typedef PVOID (*TASK)(PVOID);
 
-typedef sem_t					SEM;
-typedef pthread_mutex_t 		MUTEX;
+typedef VOID (*SIGHANDLER)(I4);
 
 typedef enum MBEOSAL_typeEnum
 {
@@ -60,8 +63,5 @@ typedef struct MBEOSAL_taskListStruct
 	MBEOSAL_TASK_CREATE_STRUCT 		*stTaskCreate;
 	struct MBEOSAL_taskListStruct 	*next;
 }MBEOSAL_TASK_LIST_STRUCT;
-
-I2 mbeOSALtaskCreate(MBEOSAL_TASK_CREATE_STRUCT *);
-I2 mbeOSALtaskJoin(TASK_ID);
 
 #endif /* SRC_OSAL_INCLUDE_OSAL_TYPE_H_ */

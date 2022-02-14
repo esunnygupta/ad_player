@@ -4,7 +4,7 @@ all: build
 
 build:
 	$(MAKE) -C http_client/src
-#	@./setup.sh
+	@./setup.sh
 
 clean:
 	$(MAKE) -C http_client/src clean

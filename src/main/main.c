@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 
 #include <mosquitto.h>
+#include <mongoc/mongoc.h>
 
 #include <logs.h>
 #include <version.h>
@@ -27,16 +28,22 @@
 
 TASK_ID gAppMainTaskID;
 I4 gMessageQdescriptor;
+extern mongoc_client_t *gMongoClient;
 
 VOID cleanup()
 {
 	I2 retval;
 	
+	// Mosquitto library cleanup
 	retval = mosquitto_lib_cleanup();
 	if (retval < 0)
 	{
 		eprintf("mosquitto library cleanup failed...\n");
 	}
+
+	// Mongo C Driver cleanup
+	mongoc_client_destroy(gMongoClient);
+	mongoc_cleanup();
 }
 
 PVOID mbeAppMainTask()
@@ -46,6 +53,10 @@ PVOID mbeAppMainTask()
 	const char message_q_name[8] = "/main_q";
 
 	mprintf("init...\n");
+
+	// Create a Message Q for sending events.
+	mqdes = mbeCreateMessageQ(message_q_name, O_CREAT | O_RDWR, 0660);
+	gMessageQdescriptor = mqdes;
 	
 	// TODO: System and network check. Raise error if any issue.
 
@@ -58,10 +69,6 @@ PVOID mbeAppMainTask()
 
 	// Register Signal Handler for SIGINT
 	mbeRegisterSignalHandler(SIGINT, mbeSigIntHandler);
-
-	// Create a Message Q for sending events.
-	mqdes = mbeCreateMessageQ(message_q_name, O_CREAT | O_RDWR, 0660);
-	gMessageQdescriptor = mqdes;
 
 	mprintf("exit...\n");
 

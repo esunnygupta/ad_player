@@ -10,6 +10,9 @@
 #include <stdlib.h>
 
 #include <mosquitto.h>
+#include <mongoc/mongoc.h>
+#include <bson/bson.h>
+#include <cjson/cJSON.h>
 
 #include <logs.h>
 #include <osal_type.h>
@@ -19,14 +22,17 @@
 #include <hw_info.h>
 #include <subscriber.h>
 #include <mpv_client.h>
+#include <app_mongoc.h>
 
 TASK_ID gSubscriberTaskID;
 struct mosquitto *mosq_client;
 extern I4 gMessageQdescriptor;
+extern mongoc_client_t *gMongoClient;
 
 VOID mbeSubscriberConnectCallback(struct mosquitto *mosq_client, PVOID obj, I4 rc)
 {
 	mprintf("Connect [%d]\n", rc);
+	mosquitto_subscribe(mosq_client, NULL, MQTT_TOPIC, 0);
 }
 
 VOID mbeSubscriberDisconnectCallback(struct mosquitto *mosq_client, PVOID obj, I4 rc)
@@ -41,8 +47,40 @@ VOID mbeSubscriberSubscribeCallback(struct mosquitto *mosq_client, PVOID obj, I4
 
 VOID mbeSubscriberMessageCallback(struct mosquitto *mosq_client, PVOID obj, const struct mosquitto_message *mosq_message)
 {
+	mongoc_collection_t *collection;
+	bson_error_t error;
+	bson_oid_t oid;
+	bson_t *doc;
+	cJSON *json_data;
+	cJSON *link_data;
+
 	mprintf("Message: %s\n", (char *)mosq_message->payload);
-	mbeSendMessageToMsgQ(gMessageQdescriptor, (const char *)mosq_message->payload, mosq_message->payloadlen);
+	collection = mongoc_client_get_collection(gMongoClient, MONGO_DATABASE, MONGO_SCHEDULE_COLLECTION);
+	doc = bson_new_from_json(mosq_message->payload, -1, &error);
+	bson_oid_init(&oid, NULL);
+	BSON_APPEND_OID(doc, "_id", &oid);
+	if (!mongoc_collection_insert_one(collection, doc, NULL, NULL, &error))
+	{
+		eprintf("Failed to insert to database.\n");
+	}
+	bson_destroy(doc);
+	mongoc_collection_destroy(collection);
+	json_data = cJSON_Parse(mosq_message->payload);
+	if (json_data == NULL)
+	{
+		const char *error = cJSON_GetErrorPtr();
+		if (error != NULL)
+		{
+			eprintf("Error before: %s\n", error);
+		}
+	}
+	link_data = cJSON_GetObjectItem(json_data, "link");
+	if (link_data != NULL)
+	{
+		mprintf("Video Link: %s\n", link_data->valuestring);
+		mbeSendMessageToMsgQ(gMessageQdescriptor, (const char *)link_data->valuestring, mosq_message->payloadlen);
+	}
+	cJSON_Delete(json_data);
 }
 
 PVOID mbeSubscriberTask()
@@ -61,7 +99,6 @@ PVOID mbeSubscriberTask()
 	mosquitto_subscribe_callback_set(mosq_client, mbeSubscriberSubscribeCallback);
 	mosquitto_message_callback_set(mosq_client, mbeSubscriberMessageCallback);
 	mosquitto_connect(mosq_client, MQTT_SERVER_IP, MQTT_SERVER_PORT, MQTT_CONNECTION_TIMEOUT);
-	mosquitto_subscribe(mosq_client, NULL, MQTT_TOPIC, 0);
 	retval = mosquitto_loop_forever(mosq_client, -1, 1);
 	if (retval != MOSQ_ERR_SUCCESS)
 	{

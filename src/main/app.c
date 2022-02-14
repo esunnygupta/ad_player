@@ -15,6 +15,8 @@
 #include <client.h>
 #include <subscriber.h>
 #include <player.h>
+#include <app_mongoc.h>
+#include <auth.h>
 
 MBEMAIN_FILE_INFO_STRUCT stFileInfo;
 
@@ -30,7 +32,7 @@ I2 app()
 	// Initialize Client
 
 	// Authenticate Client
-	// mbeGetToken();
+	mbeGetAuthToken();
 
 	// Set Media - Temporary Basis
 	// mbeSetMedia();
@@ -39,6 +41,7 @@ I2 app()
 	// mbeProtocolTaskCreate();
 	mbeSubscriberTaskCreate();
 	mbePlayerTaskCreate();
+	mbeMongoCInit();
 
 	// Delete Tasks
 	// mbeProtocolTaskDelete();

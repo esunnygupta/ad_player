@@ -10,7 +10,7 @@ all: clean build
 build:$(OBJS)
 	@$(MKDIR) builds
 	$(CC) -shared -o $(OUTPUT) $(OBJS) $(IDIR)
-	$(CP) $(OUTPUT) $(PRJROOT)/lib
+	$(CP) $(OUTPUT) $(PRJROOT)/lib/arm
 	$(MV) -f *.o builds
 
 %.o:%.c

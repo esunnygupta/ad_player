@@ -6,14 +6,15 @@ run:
 	@./bin/$(EXE)
 
 link:
-	$(CC) -o $(EXE) build/*.o $(LDFLAGS) $(CFLAGS) $(LIBS)
+	$(CC) -o $(EXE) build/*.o $(CFLAGS) $(LDFLAGS) $(LIBS)
 	@$(MV) $(EXE) bin
 
 create_build:
-	@mkdir build
-	@mkdir bin
+	@mkdir -p build
+	@mkdir -p bin
+	@mkdir -p src/include
 
-setup:
+setup: create_build headers
 	$(MAKE) -C lib
 
 app: create_build headers
@@ -43,7 +44,7 @@ clean:
 	$(MAKE) -C src/auth clean
 	$(MAKE) -C src/downloader clean
 	$(MAKE) -C lib clean
-	@$(RM) -rf src/include/*.h
+	@$(RM) -rf src/include
 	@$(RM) -rf build/*.o
 	@$(RM) -rf build
 	@$(RM) -rf bin/*

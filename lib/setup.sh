@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #sudo apt update
-sudo apt install libc-ares-dev libssl-dev
+sudo apt install cmake autoconf libc-ares-dev libssl-dev
 
 ROOT=$(pwd)
 
@@ -49,5 +49,14 @@ cd $ROOT
 tar -xf compressed/curl-7.82.0.tar.gz
 cd $ROOT/curl-7.82.0
 ./configure --with-openssl
+make
+sudo make install
+
+# Setup SDL2
+cd $ROOT
+tar -xf compressed/SDL2-2.0.20.tar.gz
+cd $ROOT/SDL2-2.0.20
+./autogen
+./configure
 make
 sudo make install

@@ -8,8 +8,8 @@
 #ifndef SRC_MAIN_INCLUDE_HW_INFO_H_
 #define SRC_MAIN_INCLUDE_HW_INFO_H_
 
-#define SERIAL_NO	"1501MBE8S2301"
-#define CHIP_ID		"728928"
+#define SERIAL_NO	"1501MBE8S2303"
+#define CHIP_ID		"728930"
 
 typedef struct MBEMAIN_hwInfoStruct
 {

@@ -39,7 +39,11 @@ typedef void * 					PVOID;
 
 typedef pthread_mutex_t 		MUTEX;
 
+typedef pthread_cond_t			COND;
+
 typedef mode_t					MODE;
+
+typedef timer_t					TIMER;
 
 typedef PVOID (*TASK)(PVOID);
 

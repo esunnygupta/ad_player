@@ -2,6 +2,7 @@ include $(PRJROOT)/inc.mk
 
 IDIR+=-Iinclude/
 IDIR+=-I$(PRJROOT)/src/include/
+IDIR+=-I$(PRJROOT)/lib/http_client/include
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:.c=.o)
 
@@ -9,7 +10,7 @@ headers:
 	@$(CP) include/*.h $(PRJROOT)/src/include/
 
 build:$(OBJS)
-	@$(ECHO) "\033[0;32m----------compiling timer completed----------\033[0;37m"
+	@$(ECHO) "\033[0;32m----------compiling downloader completed----------\033[0;37m"
 	@$(MV) *.o $(PRJROOT)/build/
 
 %.o:%.c

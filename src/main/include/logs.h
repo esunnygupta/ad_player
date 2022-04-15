@@ -11,10 +11,11 @@
 #define MAIN_DEBUG_LOG 1
 
 #if MAIN_DEBUG_LOG
-	#define mprintf printf("\x1B[32m[%s %d %s]# \x1B[37m",__FILE__,__LINE__,__func__); printf
-	#define eprintf printf("\x1B[31m[%s %d %s]# \x1B[37m",__FILE__,__LINE__,__func__); printf
+	#define mprintf printf("\x1B[32m[%15s %04d %32s]# \t \x1B[37m",__FILE__,__LINE__,__func__); printf
+	#define eprintf printf("\x1B[31m[%15s %04d %32s]# \t \x1B[37m",__FILE__,__LINE__,__func__); printf
 #else
-	#define mprintf
+	#define mprintf(...)
+	#define eprintf(...)
 #endif
 
 #endif /* INCLUDE_MAIN_LOGS_H_ */

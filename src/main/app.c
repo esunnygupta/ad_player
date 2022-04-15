@@ -17,6 +17,7 @@
 #include <player.h>
 #include <app_mongoc.h>
 #include <auth.h>
+#include <downloader.h>
 
 MBEMAIN_FILE_INFO_STRUCT stFileInfo;
 
@@ -30,9 +31,10 @@ VOID mbeSetMedia()
 I2 app()
 {
 	// Initialize Client
+	mbeMongoCInit();
 
 	// Authenticate Client
-	mbeGetAuthToken();
+	// mbeGetAuthToken();
 
 	// Set Media - Temporary Basis
 	// mbeSetMedia();
@@ -41,12 +43,13 @@ I2 app()
 	// mbeProtocolTaskCreate();
 	mbeSubscriberTaskCreate();
 	mbePlayerTaskCreate();
-	mbeMongoCInit();
+	mbeDownloaderTaskCreate();
 
 	// Delete Tasks
 	// mbeProtocolTaskDelete();
 	mbeSubscriberTaskDelete();
 	mbePlayerTaskDelete();
+	mbeDownloaderTaskDelete();
 
 	return 0;
 }

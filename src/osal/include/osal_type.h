@@ -8,8 +8,11 @@
 #ifndef SRC_OSAL_INCLUDE_OSAL_TYPE_H_
 #define SRC_OSAL_INCLUDE_OSAL_TYPE_H_
 
+#include <stdbool.h>
 #include <fcntl.h>
 #include <pthread.h>
+
+typedef bool					BOOL;
 
 typedef unsigned long int		TASK_ID;
 

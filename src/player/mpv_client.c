@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <osal_type.h>
 #include <logs.h>
 
 #include <SDL.h>
@@ -14,7 +15,7 @@ static Uint32 wakeup_on_mpv_render_update, wakeup_on_mpv_events;
 
 static void die(const char *msg)
 {
-    fprintf(stderr, "%s\n", msg);
+    mprintf("%s\n", msg);
     exit(1);
 }
 
@@ -37,6 +38,8 @@ static void on_mpv_render_update(void *ctx)
 
 int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
 {
+    volatile BOOL running = true;
+
     if (mpv != NULL || mpv_gl != NULL)
         return 0;
 
@@ -53,13 +56,13 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
     // Jesus Christ SDL, you suck!
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
         die("SDL init failed");
 
     SDL_Window *window =
-        SDL_CreateWindow("hi", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        SDL_CreateWindow("Violet Media Player", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                          1000, 500, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
-                                    SDL_WINDOW_RESIZABLE);
+                                    SDL_WINDOW_FULLSCREEN);
     if (!window)
         die("failed to create SDL window");
 
@@ -114,7 +117,7 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
     const char *cmd[] = {"loadfile", message, NULL};
     mpv_command_async(mpv, 0, cmd);
 
-    while (1) {
+    while (running) {
         SDL_Event event;
         if (SDL_WaitEvent(&event) != 1)
             die("event loop error");
@@ -122,7 +125,8 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
         switch (event.type) {
         case SDL_QUIT:
             mprintf("Captured quit event\n");
-            goto done;
+            running = false;
+            break;
         case SDL_WINDOWEVENT:
             if (event.window.event == SDL_WINDOWEVENT_EXPOSED)
                 redraw = 1;
@@ -139,7 +143,7 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
                                          "screenshot.png",
                                          "window",
                                          NULL};
-                printf("attempting to save screenshot to %s\n", cmd_scr[1]);
+                mprintf("attempting to save screenshot to %s\n", cmd_scr[1]);
                 mpv_command_async(mpv, 0, cmd_scr);
             }
             break;
@@ -166,10 +170,14 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
                         // any time, so it's possible this logging stops working
                         // in the future.)
                         if (strstr(msg->text, "DR image"))
-                            printf("log: %s", msg->text);
+                            mprintf("(VMP) log: %s", msg->text);
                         continue;
                     }
-                    printf("event: %s\n", mpv_event_name(mp_event->event_id));
+                    mprintf("event: %d %s\n", mp_event->event_id, mpv_event_name(mp_event->event_id));
+                    if (mp_event->event_id == MPV_EVENT_END_FILE) {
+                        running = false;
+                        break;
+                    }
                 }
             }
         }
@@ -196,7 +204,6 @@ int mpv_main(char *message, mpv_handle *mpv, mpv_render_context *mpv_gl)
             SDL_GL_SwapWindow(window);
         }
     }
-done:
 
     // Destroy the GL renderer and all of the GL objects it allocated. If video
     // is still running, the video track will be deselected.
@@ -204,7 +211,8 @@ done:
     SDL_Quit();
 
     mpv_terminate_destroy(mpv);
+    mpv = NULL;
 
-    printf("properly terminated\n");
+    mprintf("properly terminated\n");
     return 0;
 }

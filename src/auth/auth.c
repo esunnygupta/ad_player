@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 
-#include <HTTPClient.h>
 #include <cjson/cJSON.h>
 
 #include <logs.h>

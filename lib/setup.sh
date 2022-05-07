@@ -60,3 +60,11 @@ cd $ROOT/SDL2-2.0.20
 ./configure
 make
 sudo make install
+
+# Setup Media Player (MPV)
+cd $ROOT
+tar -xf compressed/mpv-build-20220423.tar.gz
+cd $ROOT/mpv-build
+cp $ROOT/mpv_options $ROOT/mpv-build
+./rebuild
+cp $ROOT/mpv-build/mpv/build/libmpv.so $ROOT/../lib/x86_64/
